@@ -8,11 +8,40 @@
     tools:context=".MainActivity"
     tools:showIn="@layout/activity_main">
 
+
     <fragment
         android:id="@+id/sceneform_fragment"
         android:name="com.captech.ar.CapTechARFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/changePostItTextConstraintLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#33000000"
+        android:visibility="gone">
+
+        <EditText
+            android:id="@+id/editTextField"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Place Text Here"
+            android:textColor="@android:color/white"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/saveTextButton" />
+
+        <Button
+            android:id="@+id/saveTextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save Text"
+            app:layout_constraintRight_toRightOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
+
+
 
     <FrameLayout
         android:id="@+id/gallery_layout"

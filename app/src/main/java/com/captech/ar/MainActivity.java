@@ -16,15 +16,22 @@
 
 package com.captech.ar;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.ar.core.Anchor;
 import com.google.ar.core.Frame;
@@ -47,6 +54,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ArFragment mFragment;
     private GestureDetector mGestureDetector;
     private ImageView postImageView;
+    private ConstraintLayout editTextConstraintLayout;
+    private EditText editTextField;
+    private Button saveTextButton;
     private FloatingActionButton fab;
     private int selectedId = -1;
 
@@ -55,9 +65,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         fab = findViewById(R.id.fab);
         postImageView = findViewById(R.id.postIcon);
+        editTextConstraintLayout = findViewById(R.id.changePostItTextConstraintLayout);
+        saveTextButton = findViewById(R.id.saveTextButton);
+        editTextField = findViewById(R.id.editTextField);
 
         mFragment = (ArFragment)
                 getSupportFragmentManager().findFragmentById(R.id.sceneform_fragment);
@@ -108,7 +122,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-
     /**
      * Method that takes the user's tap event and creates an anchor from it
      * to attach a renderable post it note.
@@ -138,7 +151,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
     }
-
 
     /**
      * Method to build the renderable post it note.
@@ -187,6 +199,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     noteText.setRenderable(viewRenderable);
                     noteText.setLocalPosition(new Vector3(0.0f, -0.05f, 0f));
                 });
+
+        node.setOnTapListener((hitTestResult, motionEvent) -> {
+            if (editTextConstraintLayout.getVisibility() == View.GONE) {
+                editTextConstraintLayout.setVisibility(View.VISIBLE);
+                saveTextButton.setOnClickListener(view -> {
+                    TextView tv;
+                    for (Node nodeInstance : node.getChildren()) {
+                        if (nodeInstance.getRenderable() instanceof ViewRenderable) {
+                            tv = ((ViewRenderable) nodeInstance.getRenderable()).getView().findViewById(R.id.postItNoteTextView);
+                            tv.setText(editTextField.getText());
+                            editTextConstraintLayout.setVisibility(View.GONE);
+                            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                            break;
+                        }
+                    }
+                });
+                node.select();
+            } else {
+                editTextConstraintLayout.setVisibility(View.GONE);
+            }
+        });
 
 
         fragment.getArSceneView().getScene().addChild(anchorNode);

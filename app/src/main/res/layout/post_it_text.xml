@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView
+<TextView android:id="@+id/postItNoteTextView"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="40dp"
+    android:layout_height="40dp"
+    android:gravity="center"
+    app:autoSizeTextType="uniform"
+    android:maxLines="1"
+    app:autoSizeMaxTextSize="10dp"
+    app:autoSizeMinTextSize="2dp"
     android:fontFamily="@font/attack_of_the_cucumbers"
-    android:text="I'm a\nNote!"/>
+    android:textColor="@android:color/black"
+    android:textStyle="bold" />
