@@ -49,6 +49,21 @@ import com.google.ar.sceneform.rendering.ViewRenderable;
 import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
 
+/**
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ArFragment mFragment;
@@ -72,7 +87,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         editTextConstraintLayout = findViewById(R.id.changePostItTextConstraintLayout);
         saveTextButton = findViewById(R.id.saveTextButton);
         editTextField = findViewById(R.id.editTextField);
-
         mFragment = (ArFragment)
                 getSupportFragmentManager().findFragmentById(R.id.sceneform_fragment);
 
@@ -100,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //take a photo on clicking of the fab
         fab.setOnClickListener(view -> PhotoUtils.takePhoto(mFragment));
 
+        //click listener for selecting that you want to post a note.
         postImageView.setOnClickListener(this);
 
     }
@@ -183,29 +198,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private void addNodeToScene(ArFragment fragment, Anchor anchor, Renderable renderable) {
         AnchorNode anchorNode = new AnchorNode(anchor);
-        TransformableNode node = new TransformableNode(fragment.getTransformationSystem());
-        node.setRenderable(renderable);
-        node.setParent(anchorNode);
+        TransformableNode postitNode = new TransformableNode(fragment.getTransformationSystem());
+        postitNode.setRenderable(renderable);
+        postitNode.setParent(anchorNode);
 
         //rotate the post it to stick to the flat surface.
-        node.setLocalRotation(new Quaternion(.65f, 0f, 0f, -.5f));
+        postitNode.setLocalRotation(new Quaternion(.65f, 0f, 0f, -.5f));
 
         //add text view node
         ViewRenderable.builder().setView(this, R.layout.post_it_text).build()
                 .thenAccept(viewRenderable -> {
                     Node noteText = new Node();
                     noteText.setParent(fragment.getArSceneView().getScene());
-                    noteText.setParent(node);
+                    noteText.setParent(postitNode);
                     noteText.setRenderable(viewRenderable);
                     noteText.setLocalPosition(new Vector3(0.0f, -0.05f, 0f));
                 });
 
-        node.setOnTapListener((hitTestResult, motionEvent) -> {
+        //adding a tap listener to change the text of a note
+        postitNode.setOnTapListener((hitTestResult, motionEvent) -> {
+            //select it on touching so we can rotate it and position it as needed
+            postitNode.select();
+
+            //toggle the edit text view.
             if (editTextConstraintLayout.getVisibility() == View.GONE) {
                 editTextConstraintLayout.setVisibility(View.VISIBLE);
+
+                //save the text when the user wants to
                 saveTextButton.setOnClickListener(view -> {
                     TextView tv;
-                    for (Node nodeInstance : node.getChildren()) {
+                    for (Node nodeInstance : postitNode.getChildren()) {
                         if (nodeInstance.getRenderable() instanceof ViewRenderable) {
                             tv = ((ViewRenderable) nodeInstance.getRenderable()).getView().findViewById(R.id.postItNoteTextView);
                             tv.setText(editTextField.getText());
@@ -216,7 +238,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     }
                 });
-                node.select();
             } else {
                 editTextConstraintLayout.setVisibility(View.GONE);
             }
@@ -224,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         fragment.getArSceneView().getScene().addChild(anchorNode);
-        node.select();
+        postitNode.select();
     }
 
 }

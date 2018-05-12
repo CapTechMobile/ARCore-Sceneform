@@ -27,7 +27,7 @@
             android:id="@+id/editTextField"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Place Text Here"
+            android:text="#CapTechNation"
             android:textColor="@android:color/white"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@id/saveTextButton" />
